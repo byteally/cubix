@@ -1,3 +1,4 @@
+{-
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 {-# OPTIONS_GHC -ddump-splices #-}
 
@@ -11,29 +12,28 @@
 
 -- This is a separate file due to GHC's phase restriction
 
-module Cubix.Language.C.Parametric.Full.Types where
+module Cubix.Language.CSharp.Parametric.Full.Types where
 
 #ifndef ONLY_ONE_LANGUAGE
-import qualified Language.C.Syntax as C ( CTranslationUnit )
+import qualified Language.CSharp.Syntax as CS ( CompUnit )
 
 import Data.Comp.Multi ( Term )
 import Data.Comp.Trans ( runCompTrans, withSubstitutions, deriveMultiComp, makeSumType )
 
 import Cubix.Language.Info
-import Cubix.Language.C.Parametric.Full.Names
+import Cubix.Language.CSharp.Parametric.Full.Names
 import Cubix.Language.Parametric.Derive
 import Cubix.Language.Parametric.Syntax.Base
 
 -----------------------------------------------------------
 
-x = 5;
-
 do substs <- makeSubsts
-   runCompTrans $ withSubstitutions substs $ deriveMultiComp ''C.CTranslationUnit
+   runCompTrans $ withSubstitutions substs $ deriveMultiComp ''CS.CompUnit
 
 deriveAll newASTTypes
-runCompTrans $ makeSumType "CSig" cSigNames
+runCompTrans $ makeSumType "CSharpSig" csharpSigNames
 
-type CTerm = Term CSig
-type CTermLab l = TermLab CSig l
+type CSharpTerm      = Term    CSharpSig
+type CSharpTermLab l = TermLab CSharpSig l
 #endif
+-}

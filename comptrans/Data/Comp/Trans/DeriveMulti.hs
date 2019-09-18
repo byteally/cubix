@@ -41,6 +41,7 @@ checkUniqueVar con = if length (filter isVar fields) <= 1 then
     fields = case con of
       RecC _ sts    -> map (^. _3) sts
       NormalC _ sts -> map (^. _2) sts
+      InfixC l _ r  -> [l ^. _2, r ^. _2]
       _             -> error $ "Attempted to derive multi-sorted compositional datatype for something with non-normal constructors: " ++ show con
 
 mkGADT :: Name -> [Con] -> CompTrans [Dec]
@@ -59,6 +60,19 @@ mkGADT n cons = do
 
 
 mkCon :: Name -> Name -> Name -> Con -> CompTrans Con
+mkCon l e i (InfixC ls _ rs)  = view annotationProp >>= mkConInfix
+   where
+     mkConInfix annPropInfo = ForallC [] ctx <$> inner
+      where
+        ctx = [foldl AppT EqualityT [(VarT i), (ConT $ nameLab l)]]
+        sts   = [ls , rs]
+        n     = mkName "InfixN"
+        sts'  = case annPropInfo of
+                  Just api -> filter (not . (api ^. isAnnotation) . (^. _2)) sts
+                  Nothing  -> sts
+        sts'' = sts' & (traverse._2) %%~ unfixType e
+        inner = liftM (NormalC (transName n)) sts''
+
 mkCon l e i (NormalC n sts) = view annotationProp >>= mkConNormal
    where
      mkConNormal annPropInfo = ForallC [] ctx <$> inner

@@ -36,6 +36,7 @@ module Cubix.Language.Parametric.Syntax.Base (
   ,        iCharF
   , pattern UnitF'
   ,        iUnitF
+  , iCharF
   ) where
 
 import Data.Comp.Multi ( Cxt, HFunctor, (:<:), project)

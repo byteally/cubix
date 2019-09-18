@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -ddump-splices #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}

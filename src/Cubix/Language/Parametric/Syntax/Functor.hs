@@ -23,6 +23,7 @@ module Cubix.Language.Parametric.Syntax.Functor
   , PairF(..)
   , TripleF(..)
   , EitherF(..)
+  -- , NonEmptyF(..)
 
   , pattern Just'
   , pattern Nothing'
@@ -52,6 +53,7 @@ module Cubix.Language.Parametric.Syntax.Functor
   , riTripleF
   , riLeftF
   , riRightF
+  -- , iNonEmptyF
 
     -- * Converting functorial syntax
   , ExtractF(..)
@@ -79,6 +81,7 @@ import Data.Typeable ( Typeable, eqT )
 
 import Cubix.Language.Parametric.InjF
 
+-- import Language.CSharp.Syntax (NonEmpty (..))
 
 --------------------------------------------------------------------------------
 -- Higher-order versions of standard functors
@@ -127,6 +130,11 @@ data TripleF e l where
 data EitherF e l where
   LeftF  :: (Typeable i, Typeable j) => e i -> EitherF e (Either i j)
   RightF :: (Typeable i, Typeable j) => e j -> EitherF e (Either i j)
+{-
+data NonEmptyF e l where
+  NonEmptyF  :: Typeable l => e l -> e [l] -> NonEmptyF e (NonEmpty l)
+-}
+
 
 --------------------------------------------------------------------------------
 -- Instances of Generic
@@ -321,6 +329,10 @@ riNilF = inject NilF
 iConsF :: (ListF :<: f, InjF f [l] l', Typeable l) => Cxt h f a l -> Cxt h f a [l] -> Cxt h f a l'
 iConsF x y = injectF (ConsF x y)
 
+-- iNonEmptyF :: (NonEmptyF :<: f, InjF f (NonEmpty l) l', Typeable l) => Cxt h f a l -> Cxt h f a [l] -> Cxt h f a l'
+-- iNonEmptyF x y = injectF (NonEmptyF x y)
+
+
 -- | Smart constructor for PairF. Restricted; cannot be lifted through a sort injection
 riPairF :: (PairF :<: f, Typeable i, Typeable j) => Cxt h f a i -> Cxt h f a j -> Cxt h f a (i, j)
 riPairF x y = inject (PairF x y)
@@ -336,7 +348,7 @@ riRightF = inject . RightF
 
 $(derive [makeHFunctor, makeHTraversable, makeHFoldable, makeEqHF, makeShowHF,
                     makeOrdHF ]
-       [''MaybeF, ''ListF, ''PairF, ''TripleF, ''EitherF])
+       [''MaybeF, ''ListF, ''PairF, ''TripleF, ''EitherF]) --  ''NonEmptyF])
 
 --------------------------------------------------------------------------------
 -- Dealing with functorial syntax

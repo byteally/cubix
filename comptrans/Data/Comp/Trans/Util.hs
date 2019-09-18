@@ -60,6 +60,7 @@ import Language.Haskell.TH.Syntax hiding ( lift )
 
 import Data.ByteString ( ByteString )
 import Data.Text ( Text )
+-- import Language.CSharp (NonEmpty (..))
 
 
 type CompTrans = ReaderT TransCtx Q
@@ -110,7 +111,7 @@ withExcludedNames names = local (excludedNames .~ names)
    Type synonyms need not be present.
 -}
 standardExcludedNames :: Set Name
-standardExcludedNames = fromList [''Maybe, ''Either, ''Int, ''Integer, ''Bool, ''Char, ''Double, ''Text, ''ByteString]
+standardExcludedNames = fromList [''Maybe, ''Either, ''Int, ''Integer, ''Bool, ''Char, ''Double, ''Text, ''ByteString] -- , ''NonEmpty]
 
 
 {-
@@ -172,6 +173,7 @@ simplifyDataInf _                               = error "Attempted to derive mul
 extractCon :: Con -> (Name, [Type])
 extractCon (NormalC nm sts) = (nm, map snd sts)
 extractCon (RecC nm vsts)   = (nm, map (^. _3) vsts)
+extractCon (InfixC l nm r)  = (nm, [snd l , snd r])
 extractCon (ForallC _ _ c)  = extractCon c
 extractCon _                = error "Unsupported constructor type encountered"
 
