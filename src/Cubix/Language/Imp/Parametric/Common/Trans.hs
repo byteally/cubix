@@ -32,7 +32,7 @@ import Data.Comp.Multi.Strategic ( crushtdT, addFail, promoteTF )
 
 import qualified Language.Imp as ImpOrig
 
-import Cubix.Language.Imp.Parametric.Common.Types
+import Cubix.Language.Imp.Parametric.Common.Types as IPC
 import qualified Cubix.Language.Imp.Parametric.Full.Types as F
 import Cubix.Language.Parametric.Derive
 import Cubix.Language.Parametric.InjF
@@ -57,11 +57,15 @@ transDefault = inject . hfmap translate
 instance {-# OVERLAPPABLE #-} (HFunctor f, f :<: MImpSig, f :<: F.ImpSig) => Trans f where
   trans = transDefault
 
+{-
+
 instance Trans F.Ident where
   trans (F.Ident n) = iIdent (T.unpack n)
 
+-}
+
 untranslate :: MImpTerm l -> F.ImpTerm l
-untranslate = untrans . unTerm
+untranslate = undefined -- untrans . unTerm
 
 class Untrans f where
   untrans :: f MImpTerm l -> F.ImpTerm l
@@ -75,6 +79,35 @@ untransDefault = inject . hfmap untranslate
 instance {-# OVERLAPPABLE #-} (HFunctor f, f :<: F.ImpSig) => Untrans f where
   untrans = untransDefault
 
+{-
+instance {-# OVERLAPPING #-} Untrans SingleLocalVarDeclIsDeclaration where
+  untrans (SingleLocalVarDeclIsDeclaration v) = untransDecl v
+
+untransDecl :: MImpTerm SingleLocalVarDeclL -> F.ImpTerm F.DeclarationL
+untransDecl (SingleLocalVarDecl' _ bind init) =
+  F.iDecl (untranslate (fromProjF bind)) undefined
+  -- (untranslate (fromProjF init))
+-}
+
+-- instance InjF MImpSig LocalVarInitL F.ExprL where
+--  injF 
+
+{-
+instance Untrans ExprIsLocalVarInit where
+  untrans (ExprIsLocalVarInit v) =
+    untransExpr v
+-}
+
+-- untransExpr :: MImpTerm F.ExprL -> F.ImpTerm LocalVarInitL
+-- untransExpr (ImpFunctionCall' e vs) =
+--   F.iFunctionCall undefined undefined
+
+instance Untrans SingleLocalVarDeclIsDeclaration where
+  untrans (SingleLocalVarDeclIsDeclaration sv) =
+    untransDecl sv
+
+untransDecl :: MImpTerm SingleLocalVarDeclL -> F.ImpTerm F.DeclarationL
+untransDecl = undefined
 
 instance {-# OVERLAPPING #-} Untrans IdentIsIdent where
   untrans (IdentIsIdent v) = untransIdent v
@@ -82,20 +115,10 @@ instance {-# OVERLAPPING #-} Untrans IdentIsIdent where
 untransIdent :: MImpTerm IdentL -> F.ImpTerm F.IdentL
 untransIdent (Ident' s) = F.iIdent (T.pack s)
 
-{-
-instance {-# OVERLAPPING #-} Untrans SingleLocalVarDeclIsDeclaration where
-  untrans (SingleLocalVarDeclIsDeclaration v) = untransDecl v
-
-untransDecl :: MImpTerm SingleLocalVarDeclL -> F.ImpTerm F.DeclarationL
-untransDecl (SingleLocalVarDecl' _ bind init) =
-  F.iDecl (untranslate bind) (untranslate init)
--}
-
 -- instance {-# OVERLAPPING #-} Untrans ExprIsLocalVarInit where
 
 untransError :: (HFunctor f, f :<: MImpSig) => f MImpTerm l -> F.ImpTerm l
 untransError t = error $ "Cannot untranslate root node: " ++ (show $ (inject t :: MImpTerm _))
-
 
 do ipsNames <- sumToNames ''MImpSig
    modNames <- sumToNames ''F.ImpSig
@@ -104,6 +127,5 @@ do ipsNames <- sumToNames ''MImpSig
                                                      , ''ExprIsLocalVarInit
                                                      ]
    return $ makeDefaultInstances targTs ''Untrans 'untrans (VarE 'untransError)
-
 #endif
 

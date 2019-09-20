@@ -36,7 +36,7 @@ import Cubix.Language.Parametric.InjF
 import qualified Cubix.Language.Parametric.Syntax as P
 
 createSortInclusionTypes [ ''P.IdentL, ''P.SingleLocalVarDeclL, ''Imp.ExprL ]
-                             [ ''Imp.IdentL, ''Imp.DeclarationL, ''P.LocalVarInitL]
+                            [ ''Imp.IdentL, ''Imp.DeclarationL, ''P.LocalVarInitL ]
 
 deriveAll [ ''IdentIsIdent
            , ''SingleLocalVarDeclIsDeclaration
@@ -46,15 +46,14 @@ deriveAll [ ''IdentIsIdent
 createSortInclusionInfers [ ''P.IdentL, ''P.SingleLocalVarDeclL, ''Imp.ExprL ]
                              [ ''Imp.IdentL, ''Imp.DeclarationL, ''P.LocalVarInitL]
 
-  
 do let impSortInjections = [ ''IdentIsIdent
-                           -- , ''SingleLocalVarDeclIsDeclaration
-                           -- , ''ExprIsLocalVarInit
+                           , ''SingleLocalVarDeclIsDeclaration
+                           , ''ExprIsLocalVarInit
+                           ] ++
+                           [ ''P.Ident
+                           , ''P.SingleLocalVarDecl
                            ]
-   let names = (impSigNames \\ [mkName "Ident"])
-                          ++ impSortInjections
-                          ++ [ ''P.Ident
-                             ]
+   let names = impSigNames ++ impSortInjections
    sumDec <- runCompTrans $ makeSumType "MImpSig" names
    return sumDec
 
@@ -64,6 +63,10 @@ type MSigTermLab = TermLab MImpSig
 type MSigCxt h a    = Cxt h MImpSig a
 type MSigCxtA h a p = Cxt h (MImpSig :&: p) a
 
-    
+pattern ImpFunctionCall' :: () => (Expr :<: f, HFunctor f) => Cxt h f a Imp.IdentL -> Cxt h f a [ExprL] -> Cxt h f a ExprL
+pattern ImpFunctionCall' b as <- (project -> Just (FunctionCall b as)) where
+  ImpFunctionCall' b as = iFunctionCall b as
+
+
 #endif
 

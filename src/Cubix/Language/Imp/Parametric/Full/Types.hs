@@ -28,3 +28,4 @@ runCompTrans $ makeSumType "ImpSig" impSigNames
 
 type ImpTerm      = Term    ImpSig
 type ImpTermLab l = TermLab ImpSig l
+

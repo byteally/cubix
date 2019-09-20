@@ -32,3 +32,4 @@ makeSubsts = do
   let substs = Map.fromList (zip vars (repeat $ TupleT 0))
   pure substs
   
+x = 5
