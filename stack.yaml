@@ -9,8 +9,6 @@ packages:
 - ./compdata
 - ./comptrans
 - ./compstrat
-# - ../langs/language-csharp-quote
-- ../langs/imp
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
@@ -24,6 +22,8 @@ extra-deps:
   commit: 68e71843294b233c36b3cbe52d9b1e35a5898997
 - git: git@github.com:bjpop/language-python.git
   commit: 9269c77ca67c52280314a122cae1b3fa1a044168
+- git: https://github.com/byteally/imp.git
+  commit: b588bca891ece14e0cb42686cc2d43e806970e46
 - mainland-pretty-0.6
 - prettyprinter-1.3.0@sha256:ec5617044a1088a37d009d005ed84159b67f18f47bfdac85fb428ec2a80c0788,5503
 - megaparsec-6.2.0
